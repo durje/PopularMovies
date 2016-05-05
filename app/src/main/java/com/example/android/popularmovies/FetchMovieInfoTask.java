@@ -195,7 +195,7 @@ public class FetchMovieInfoTask extends AsyncTask<String, Void, Void> {
                     .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY)
                     .build();
             URL url = new URL(builtUri.toString()); //URL url = new URL(baseUrl.concat(apiKey));
-            //Log.v(LOG_TAG, "url "+url.toString());
+            //Log.v(LOG_TAG, " builtUri url "+url.toString());
 
             // Create the request, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();

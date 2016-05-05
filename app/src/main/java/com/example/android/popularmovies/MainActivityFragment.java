@@ -89,6 +89,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
                 //Log.v("MainActivityFragment", " Title: " + mImageAdapter.getmMovies()[position].getTitle());
                 //Toast.makeText(getActivity(), "" + position, Toast.LENGTH_SHORT).show();
+
                 Intent intent = new Intent(getActivity(), DetailActivity.class)
                         .putExtra("movieId", mImageAdapter.getmMovies()[position].getId())
                         .putExtra("poster_path", mImageAdapter.getmMovies()[position].getPosterPath())
@@ -99,8 +100,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 startActivity(intent);
 
             }
-        });*/
-
+        });
+*/
         return rootView;
     }
 

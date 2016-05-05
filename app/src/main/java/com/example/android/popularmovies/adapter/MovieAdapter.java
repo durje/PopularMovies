@@ -21,17 +21,6 @@ import com.squareup.picasso.Picasso;
 public class MovieAdapter  extends CursorAdapter {
 
 
-    /**
-     * Cache of the children views for image list item.
-     */
-    public static class ViewHolder {
-        public final ImageView posterView;
-
-        public ViewHolder(View view) {
-            posterView = (ImageView) view.findViewById(R.id.list_item_poster_imageview);
-        }
-    }
-
     @TargetApi(11)
     public MovieAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
@@ -41,9 +30,7 @@ public class MovieAdapter  extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View imageView = LayoutInflater.from(context).inflate(R.layout.list_item_poster, parent, false);
 
-        ViewHolder viewHolder = new ViewHolder(imageView);
-        imageView.setTag(viewHolder);
-        Log.d("MovieAdapter", "new View " );
+        //Log.d("MovieAdapter", "new View " );
         return imageView;
     }
 
@@ -53,15 +40,12 @@ public class MovieAdapter  extends CursorAdapter {
         final String base_path="http://image.tmdb.org/t/p/w185/";
         String posterUrlStr =/*base_path+*/cursor.getString(COL_POSTER_PATH);
 
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
-
-
         if (((ImageView)view).getDrawable() == null) {
             Picasso.with(context)
                     .load(posterUrlStr)
                     .placeholder(R.drawable.placeholder)
                     .error(R.drawable.placeholder_error)
-                    .into(viewHolder.posterView);
+                    .into((ImageView)view);
             Log.d("MovieAdapter", "posterUrlStr: " + posterUrlStr);
             notifyDataSetChanged();
         } else {
