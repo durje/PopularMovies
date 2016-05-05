@@ -1,0 +1,86 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.android.popularmovies.DetailActivityFragment"
+    tools:showIn="@layout/content_detail"
+    android:weightSum="1">
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Chappie"
+                android:textColor="#ffffff"
+                android:textSize="50sp"
+                android:id="@+id/titleView"
+                android:layout_marginBottom="40dp"
+                android:background="#41C29B"
+                />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/posterimageView"
+                    android:paddingLeft="20dp" />
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="137dp"
+                    android:weightSum="1"
+                    android:paddingLeft="20dp"
+                    android:paddingBottom="20dp"
+                    android:textAlignment="center"
+                    android:baselineAligned="false">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/yearText"
+                        android:text="2015"
+                        android:editable="false"
+                        android:paddingTop="20dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/timeText"
+                        android:text="120min"
+                        android:enabled="false"
+                        android:visibility="invisible" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/voteAverageText"
+                        android:text="8.55/10"
+                        android:editable="false" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/synopsisText"
+                android:layout_weight="0.11"
+                android:text="synopsis "
+                android:paddingLeft="20dp"
+                android:paddingTop="20dp" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

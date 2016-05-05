@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="action_refresh" translatable="false">Refresh</string>
+    <string name="title_activity_detail">DetailActivity</string>
+
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="pref_sort_by_label">Sort By</string>
+    <string name="pref_sort_by_label_popular">Most Popular</string>
+    <string name="pref_sort_by_label_top_rated">Top Rated</string>
+    <string name="pref_sort_by_label_favorites">Favorites</string>
+
+    <string name="pref_sort_by_popular">popular</string>
+    <string name="pref_sort_by_top_rated">top_rated</string>
+    <string name="pref_sort_by_favorites">favorite</string>
+    <string name="pref_sort_by_default" translatable="false">@string/pref_sort_by_popular</string>
+
+    <string name="pref_sort_by_key" translatable="false">sort_by</string>
+
+
+    <string name="content_authority">com.example.android.popularmovies</string>
+
+
+
+</resources>
