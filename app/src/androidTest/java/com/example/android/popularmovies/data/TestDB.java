@@ -1,16 +1,6 @@
 package com.example.android.popularmovies.data;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
-
-import com.example.android.popularmovies.data.DBContract.MovieEntry;
-
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by Jerome Durand on 18/03/2016.
@@ -34,7 +24,7 @@ public class TestDB extends AndroidTestCase {
     protected void setUp() throws Exception {
         deleteTheDatabase();
     }
-
+/*
     public void testCreateDb() throws Throwable {
         // build a HashSet of all of the table names we wish to look for
         // Note that there will be another table in the DB that stores the
@@ -142,7 +132,7 @@ public class TestDB extends AndroidTestCase {
                     expectedValue + "'. " + error, expectedValue, valueCursor.getString(idx));
         }
     }
-
+*/
 /*
     public void testLocationTable() {
 
@@ -239,19 +229,19 @@ public class TestDB extends AndroidTestCase {
 
     }
 */
-
+/*
     static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {
         assertTrue("Empty cursor returned. " + error, valueCursor.moveToFirst());
         validateCurrentRecord(error, valueCursor, expectedValues);
         valueCursor.close();
     }
-
+*/
     /*
     This test uses the database directly to insert and then uses the ContentProvider to
     read out the data.  Uncomment this test to see if the basic movie query functionality
     given in the ContentProvider is working correctly.
  */
-
+/*
     public void testBasicMovieQuery() {
         // insert our test records into the database
         DbHelper dbHelper = new DbHelper(mContext);
@@ -277,7 +267,7 @@ public class TestDB extends AndroidTestCase {
         validateCursor("testBasicMovieQuery", movieCursor, testValues);
     }
 
-
+*/
     /*
          Students: The functions we provide inside of TestProvider use this utility class to test
          the ContentObserver callbacks using the PollingCheck class that we grabbed from the Android

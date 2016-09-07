@@ -1,19 +1,24 @@
 package com.example.android.popularmovies;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.example.android.popularmovies.adapter.MovieAdapter;
@@ -25,8 +30,20 @@ import com.example.android.popularmovies.data.DBContract;
 public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     //private ImageAdapter mImageAdapter;
+    private static final int MOVIE_LOADER = 0;
     private MovieAdapter mMovieAdapter;
     private GridView mGridView;
+
+    private static final String[] MOVIE_COLUMNS = {
+            DBContract.MovieEntry._ID,
+            DBContract.MovieEntry.COLUMN_POSTER_PATH
+    };
+
+    // These indices are tied to MOVIE_COLUMNS. If MOVIE_COLUMNS changes, these must change.
+    static final int COL_ID = 0;
+    public static final int COL_POSTER_PATH = 1;
+
+    public static final String SORT_BY_KEY = "movie_sort_order";
 
     public MainActivityFragment() {
     }
@@ -39,7 +56,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        //inflater.inflate(R.menu.menuitem_refresh_fragment, menu);
+        //inflater.inflate(R.menu., menu);
     }
 
     @Override
@@ -62,26 +79,38 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         // The ImageAdapter will take data from a source and
         // use it to populate the GridView it's attached to.
         //mImageAdapter = new ImageAdapter(getActivity());
-
-
+/*
         Uri moviesUri = DBContract.MovieEntry.buildMovieUri();
-
         Cursor cur = getActivity().getContentResolver().query(moviesUri,
                 null, null, null, null);
-
-
-
+*/
+        Log.d("MainActivityFragment", "onCreateView" );
         // The CursorAdapter will take data from our cursor and populate the GridView
-        // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
-        // up with an empty list the first time we run.
-        mMovieAdapter= new MovieAdapter(getActivity(), cur, 0);
-
+        mMovieAdapter= new MovieAdapter(getActivity(), null, 0);
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // Get a reference to the GridView, and attach this adapter to it.
         mGridView = (GridView) rootView.findViewById(R.id.gridViewId);
         mGridView.setAdapter(mMovieAdapter);
+
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+
+                // CursorAdapter returns a cursor at the correct position for getItem(), or null
+                // if it cannot seek to that position.
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                if (cursor != null) {
+                    Intent intent = new Intent(getActivity(), DetailActivity.class)
+                            .setData(DBContract.MovieEntry.buildMovieUri(
+                                    cursor.getLong(COL_ID)
+                            ));
+                    startActivity(intent);
+                }
+            }
+        });
+
 /*
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -105,12 +134,27 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         return rootView;
     }
 
-    private void updateMovies(){
-        FetchMovieInfoTask task=new FetchMovieInfoTask(getActivity());
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Bundle bundle = new Bundle();
+        bundle.putString(SORT_BY_KEY, getPreferenceSortOrder());
+        getLoaderManager().initLoader(MOVIE_LOADER  ,bundle, this);
+
+    }
+
+    public  String getPreferenceSortOrder() {
+        // get sort by from share preference
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String sort_by = prefs.getString(getString(R.string.pref_sort_by_key),
                 getString(R.string.pref_sort_by_default));
-        task.execute(sort_by);
+
+        return sort_by;
+    }
+
+    private void updateMovies(){
+        FetchMovieInfoTask task=new FetchMovieInfoTask(getActivity());
+        task.execute(getPreferenceSortOrder());
     }
 
 
@@ -122,17 +166,39 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return null;
+    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+
+        String prefSortOrder = getPreferenceSortOrder();
+        Log.d("MainActivityFragment", "onCreateLoader: "+prefSortOrder );
+        //String sortOrder="popularity";
+        String sortOrder="vote_average";
+        if(prefSortOrder.equals("popular"))
+        {
+            prefSortOrder= DBContract.MovieEntry.COLUMN_POPULARITY + " DESC";
+
+        }
+        else if(prefSortOrder.equals("top_rated"))
+        {
+            sortOrder= DBContract.MovieEntry.COLUMN_VOTE_AVERAGE+ " DESC";
+        }
+        else if(prefSortOrder.equals("favorite"))
+        {
+            sortOrder= DBContract.MovieEntry.COLUMN_FAVOURITE+ " DESC";
+        }
+
+        Uri movieUri = DBContract.MovieEntry.CONTENT_URI;
+        Log.d("MainActivityFragment", "onCreateLoader" );
+        return new CursorLoader(getActivity(), movieUri, MOVIE_COLUMNS, null, null, sortOrder);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
+        mMovieAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        mMovieAdapter.swapCursor(null);
     }
 }

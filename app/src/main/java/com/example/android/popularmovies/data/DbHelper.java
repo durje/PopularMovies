@@ -20,6 +20,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.android.popularmovies.data.DBContract.MovieEntry;
+import com.example.android.popularmovies.data.DBContract.VideoEntry;
+import com.example.android.popularmovies.data.DBContract.ReviewEntry;
 
 /**
  * Manages a local database for weather data.
@@ -39,24 +41,48 @@ public class DbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
         final String SQL_CREATE_MOVIE_TABLE = "CREATE TABLE " + MovieEntry.TABLE_NAME + " (" +
-                // Why AutoIncrement here, and not above?
-                // Unique keys will be auto-generated in either case.  But for weather
-                // forecasting, it's reasonable to assume the user will want information
-                // for a certain date and all dates *following*, so the forecast data
-                // should be sorted accordingly.
-                //MovieEntry._ID + " INTEGER UNIQUE NOT NULL," +
                 MovieEntry._ID + " INTEGER PRIMARY KEY," +
                 //MovieEntry.COLUMN_ID + " INTEGER UNIQUE NOT NULL, " +
                 MovieEntry.COLUMN_TITLE + " TEXT NOT NULL," +
-                MovieEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL, " +
+                MovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT NULL, " +
                 MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
+                MovieEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, " +
+                MovieEntry.COLUMN_ADULT + " TEXT NOT NULL, " +
+                MovieEntry.COLUMN_VIDEO + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_BACKDROP_PATH + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_FAVORITE + " TEXT NOT NULL);" ;
 
+                MovieEntry.COLUMN_POPULARITY + " REAL NOT NULL, " +
+                MovieEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL, " +
+                MovieEntry.COLUMN_VOTE_COUNT + " INTEGER NOT NULL, " +
+
+                MovieEntry.COLUMN_FAVOURITE + " TEXT NOT NULL);" ;
+
+        final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE " + VideoEntry.TABLE_NAME + " ( " +
+                VideoEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                VideoEntry.COLUMN_VIDEO_ID + " TEXT UNIQUE NOT NULL, " +
+                VideoEntry.COLUMN_MOVIE_ID + " INTEGER  NOT NULL, " +
+                VideoEntry.COLUMN_KEY + " TEXT NOT NULL, " +
+                VideoEntry.COLUMN_NAME + " TEXT NULL, " +
+                VideoEntry.COLUMN_SITE + " TEXT NULL, " +
+                VideoEntry.COLUMN_SIZE + " TEXT NULL, " +
+                VideoEntry.COLUMN_TYPE + " TEXT NULL, " +
+                " FOREIGN KEY (" + VideoEntry.COLUMN_MOVIE_ID + ") REFERENCES " +
+                MovieEntry.TABLE_NAME + " (" + MovieEntry._ID + "));";
+
+        final String SQL_CREATE_REVIEW_TABLE = "CREATE TABLE " + ReviewEntry.TABLE_NAME + "(" +
+                ReviewEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                ReviewEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
+                ReviewEntry.COLUMN_ID + " TEXT NOT NULL, " +
+                ReviewEntry.COLUMN_AUTHOR + " TEXT NULL, " +
+                ReviewEntry.COLUMN_CONTENT + " TEXT NULL, " +
+                ReviewEntry.COLUMN_URL + " TEXT NULL, " +
+                " FOREIGN KEY (" + ReviewEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
+                MovieEntry.TABLE_NAME + " (" + MovieEntry._ID + "));";
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE); //execute this SQL
+        sqLiteDatabase.execSQL(SQL_CREATE_VIDEO_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_REVIEW_TABLE);
     }
 
     @Override
@@ -69,6 +95,8 @@ public class DbHelper extends SQLiteOpenHelper {
         // should be your top priority before modifying this method.
 
         //sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
+        //sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + VideoEntry.TABLE_NAME);
+        //sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ReviewEntry.TABLE_NAME);
         //use ALTER TABLE to add table
         onCreate(sqLiteDatabase);
     }

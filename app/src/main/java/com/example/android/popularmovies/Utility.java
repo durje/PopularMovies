@@ -21,6 +21,10 @@ package com.example.android.popularmovies;
  */
 
 public class Utility {
+
+
+
+
     /*
     public static String getPreferredLocation(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

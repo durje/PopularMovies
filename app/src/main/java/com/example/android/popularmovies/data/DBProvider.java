@@ -31,6 +31,11 @@ public class DBProvider extends ContentProvider {
     private DbHelper mOpenHelper;
 
     static final int MOVIE = 100;
+    static final int MOVIE_VIDEO = 101;
+    static final int MOVIE_REVIEW = 102;
+    static final int MOVIE_ID= 103;
+    static final int VIDEO = 200;
+    static final int REVIEW = 300;
 
     /*
         This UriMatcher will match each URI to the MVOIE, integer constants defined above.
@@ -48,11 +53,13 @@ public class DBProvider extends ContentProvider {
         final String authority = DBContract.CONTENT_AUTHORITY;
 
         // For each type of URI you want to add, create a corresponding code.
+        // /* String (location,...)  /# number (date,..)
         matcher.addURI(authority, DBContract.PATH_MOVIE, MOVIE);
-        //matcher.addURI(authority, com.example.android.popularmovies.data.DBContract.PATH_MOVIE + "/*", WEATHER_WITH_LOCATION);
-        //matcher.addURI(authority, com.example.android.popularmovies.data.DBContract.PATH_MOVIE + "/*/#", WEATHER_WITH_LOCATION_AND_DATE);
-
-       // matcher.addURI(authority, com.example.android.popularmovies.data.DBContract.PATH_MOVIE, LOCATION);
+        matcher.addURI(authority, DBContract.PATH_MOVIE + "/#", MOVIE_ID);
+        matcher.addURI(authority, DBContract.PATH_MOVIE + "/*" + DBContract.PATH_VIDEO, MOVIE_VIDEO);
+        matcher.addURI(authority, DBContract.PATH_MOVIE + "/*" + DBContract.PATH_REVIEW, MOVIE_REVIEW);
+        matcher.addURI(authority, DBContract.PATH_VIDEO, VIDEO);
+        matcher.addURI(authority, DBContract.PATH_REVIEW, REVIEW);
 
         return matcher;
     }
@@ -80,16 +87,18 @@ public class DBProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
-
-            // Student: Uncomment and fill out these two cases
             case MOVIE:
                 return DBContract.MovieEntry.CONTENT_TYPE;
-         /*   case WEATHER_WITH_LOCATION:
-                return com.example.android.popularmovies.data.DBContract.MovieEntry.CONTENT_TYPE;
-            case WEATHER:
-                return com.example.android.popularmovies.data.DBContract.MovieEntry.CONTENT_TYPE;
-            case LOCATION:
-                return com.example.android.popularmovies.data.DBContract.MovieEntry.CONTENT_TYPE;*/
+            case MOVIE_ID:
+                return DBContract.MovieEntry.CONTENT_TYPE;
+            case MOVIE_VIDEO:
+                return DBContract.VideoEntry.CONTENT_TYPE;
+            case MOVIE_REVIEW:
+                return DBContract.ReviewEntry.CONTENT_TYPE;
+            case VIDEO:
+                return DBContract.VideoEntry.CONTENT_TYPE;
+            case REVIEW:
+                return DBContract.ReviewEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -101,45 +110,8 @@ public class DBProvider extends ContentProvider {
         // Here's the switch statement that, given a URI, will determine what kind of request it is,
         // and query the database accordingly.
         Cursor retCursor=null;
+        //Log.d("DBProvider", "******query uri: " + uri);
         switch (sUriMatcher.match(uri)) {
-            /*
-            // "weather"
-            case WEATHER_WITH_LOCATION_AND_DATE:
-            {
-                //retCursor = getWeatherByLocationSettingAndDate(uri, projection, sortOrder);
-                break;
-            }
-            // "weather/*"
-            case WEATHER_WITH_LOCATION: {
-                retCursor = getWeatherByLocationSetting(uri, projection, sortOrder);
-                break;
-            }
-            // "weather"
-            case WEATHER: {
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        com.example.android.popularmovies.data.DBContract.MovieEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
-                break;
-            }
-            // "location"
-            case LOCATION: {
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        com.example.android.popularmovies.data.DBContract.MovieEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
-                break;
-            }*/
             // "movie"
             case MOVIE: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
@@ -151,6 +123,80 @@ public class DBProvider extends ContentProvider {
                         null,
                         sortOrder
                 );
+                if(selectionArgs!=null)
+                {
+                    //Log.d("DBProvider", "MOVIE uri: " + uri+"  "+selectionArgs[0]);
+                }
+
+                break;
+            }
+            case MOVIE_ID: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        DBContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                Log.d("DBProvider", "MOVIE_ID uri: " + uri);
+                break;
+            }
+            // movie video
+            case MOVIE_VIDEO:
+            {
+                long id = DBContract.VideoEntry.getMovieIdFromUri(uri);
+
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        DBContract.VideoEntry.TABLE_NAME,
+                        projection,
+                        DBContract.VideoEntry.COLUMN_MOVIE_ID + "=?",
+                        new String[] {Long.toString(id)},
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
+            // movie review
+            case MOVIE_REVIEW:
+            {
+                long id = DBContract.ReviewEntry.getMovieIdFromUri(uri);
+
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        DBContract.ReviewEntry.TABLE_NAME,
+                        projection,
+                        DBContract.ReviewEntry.COLUMN_MOVIE_KEY + "=?",
+                        new String[] {Long.toString(id)},
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
+            // video
+            case VIDEO:
+            {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        DBContract.VideoEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
+            // review
+            case REVIEW:
+            {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        DBContract.ReviewEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
                 break;
             }
 
@@ -161,10 +207,6 @@ public class DBProvider extends ContentProvider {
         return retCursor;
     }
 
-    /*
-        Student: Add the ability to insert Locations to the implementation of this function.
-     */
-
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
@@ -172,27 +214,11 @@ public class DBProvider extends ContentProvider {
         Uri returnUri=null;
 
         switch (match) {
-            /*
-            case WEATHER: {
 
-                long _id = db.insert(com.example.android.popularmovies.data.DBContract.MovieEntry.TABLE_NAME, null, values);
-                if ( _id > 0 ) {
-                    //returnUri = com.example.android.popularmovies.data.DBContract.MovieEntry.buildWeatherUri(_id);
-                }
-                else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
-                break;
-            }
-            case LOCATION: {
-                long _id = db.insert(com.example.android.popularmovies.data.DBContract.MovieEntry.TABLE_NAME, null, values);
-                if ( _id > 0 ) {
-                    //returnUri = com.example.android.popularmovies.data.DBContract.MovieEntry.buildLocationUri(_id);
-                }
-                else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
-                break;
-            }*/
             case MOVIE: {
+                // default favorite to 'no'
+                //values.put(DBContract.MovieEntry.COLUMN_FAVOURITE, 0);
+
                 long _id = db.insert(DBContract.MovieEntry.TABLE_NAME, null, values);
 
                 if ( _id > 0 ) {
@@ -203,6 +229,24 @@ public class DBProvider extends ContentProvider {
                     Log.d("DBProvider ", "Failed to insert row into: "+ uri);
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
+                break;
+            }
+            // video
+            case VIDEO: {
+                long _id = db.insert(DBContract.VideoEntry.TABLE_NAME, null, values);
+                if (_id > 0)
+                    returnUri = DBContract.VideoEntry.buildVideoUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            // review
+            case REVIEW: {
+                long _id = db.insert(DBContract.ReviewEntry.TABLE_NAME, null, values);
+                if (_id > 0)
+                    returnUri = DBContract.ReviewEntry.buildReviewUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
             default:
@@ -222,21 +266,22 @@ public class DBProvider extends ContentProvider {
         // this makes delete all rows return the number of rows deleted
         if ( null == selection ) selection = "1";
         switch (match) {
-            /*
-            case WEATHER:
-                rowsDeleted = db.delete(
-                        com.example.android.popularmovies.data.DBContract.MovieEntry.TABLE_NAME, selection, selectionArgs);
-                break;
-            case LOCATION:
-                rowsDeleted = db.delete(
-                        com.example.android.popularmovies.data.DBContract.MovieEntry.TABLE_NAME, selection, selectionArgs);
-                break;*/
             case MOVIE:
                 rowsDeleted = db.delete(
                         DBContract.MovieEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
+            // video
+            case VIDEO: {
+                rowsDeleted = db.delete(DBContract.VideoEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            // review
+            case REVIEW: {
+                rowsDeleted = db.delete(DBContract.ReviewEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
         }
         // Because a null deletes all rows
         if (rowsDeleted != 0) {
@@ -255,25 +300,26 @@ public class DBProvider extends ContentProvider {
         int rowsUpdated=0;
 
         switch (match) {
-            /*
-            case WEATHER:
-
-                rowsUpdated = db.update(com.example.android.popularmovies.data.DBContract.MovieEntry.TABLE_NAME, values, selection,
-                        selectionArgs);
-                break;
-            case LOCATION:
-                rowsUpdated = db.update(com.example.android.popularmovies.data.DBContract.MovieEntry.TABLE_NAME, values, selection,
-                        selectionArgs);
-                break;*/
             case MOVIE:
                 rowsUpdated = db.update(DBContract.MovieEntry.TABLE_NAME, values, selection, selectionArgs);
+                Log.d("DBProvider", "update uri: " + uri);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
-        }/*
+            // video
+            case VIDEO: {
+                rowsUpdated = db.update(DBContract.VideoEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            }
+            // review
+            case REVIEW: {
+                rowsUpdated = db.update(DBContract.ReviewEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            }
+        }
         if (rowsUpdated != 0) {
-           // getContext().getContentResolver().notifyChange(uri, null);
-        }*/
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
         return rowsUpdated;
     }
 
@@ -282,13 +328,14 @@ public class DBProvider extends ContentProvider {
     public int bulkInsert(Uri uri, ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
+        int returnCount = 0;
+
         switch (match) {
             case MOVIE:
                 db.beginTransaction();
-                int returnCount = 0;
+
                 try {
                     for (ContentValues value : values) {
-
                         // First, check if the movie exists in the db
                         String key=value.get("_id").toString();
 
@@ -307,13 +354,57 @@ public class DBProvider extends ContentProvider {
                             Log.v("bulkInsert EXIST "," ID: "+  movieId);*/
                         } else
                         {
-                            Log.d("bulkInsert", value.get("_id").toString());
+                            //Log.d("bulkInsert", value.get("_id").toString());
 
                             long _id = db.insert(DBContract.MovieEntry.TABLE_NAME, null, value);
                             //Log.d("DBProvider ", "bulkInsert "+ _id);
                             if (_id != -1) {
                                 returnCount++;
                             }
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
+            // video
+            case VIDEO:
+                db.beginTransaction();
+                try {
+                    for (ContentValues value : values) {
+
+                        // First, check if the movie exists in the db
+                        Cursor videoCursor = this.query(
+                                DBContract.VideoEntry.CONTENT_URI,
+                                new String[]{DBContract.VideoEntry.COLUMN_VIDEO_ID},
+                                DBContract.VideoEntry.COLUMN_VIDEO_ID + " = ?" ,
+                                new String[]{value.get(DBContract.VideoEntry.COLUMN_VIDEO_ID).toString()},
+                                null);
+
+                        if (!videoCursor.moveToFirst()) {
+
+                            long key = db.insert(DBContract.VideoEntry.TABLE_NAME, null, value);
+                            if (key != -1) {
+                                returnCount++;
+                            }
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
+            // review
+            case REVIEW:
+                db.beginTransaction();
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(DBContract.ReviewEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCount++;
                         }
                     }
                     db.setTransactionSuccessful();

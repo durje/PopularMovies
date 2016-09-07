@@ -1,15 +1,14 @@
 package com.example.android.popularmovies;
 
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.android.popularmovies.data.DBContract;
-import com.example.android.popularmovies.model.Movie;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Vector;
 
@@ -28,7 +28,7 @@ import java.util.Vector;
  *
 
  */
-public class FetchMovieInfoTask extends AsyncTask<String, Void, Void> {
+public class FetchMovieInfoTask extends AsyncTask<String, Void, String> {
 
     private final String LOG_TAG = FetchMovieInfoTask.class.getSimpleName();
 
@@ -48,7 +48,7 @@ public class FetchMovieInfoTask extends AsyncTask<String, Void, Void> {
 
      * @return the row ID of the added movie.
      */
-
+/*
     long addMovieToDB(Movie aMovie ) {
 
         long movieId;
@@ -80,7 +80,7 @@ public class FetchMovieInfoTask extends AsyncTask<String, Void, Void> {
             movieValues.put(DBContract.MovieEntry.COLUMN_OVERVIEW, aMovie.getOverview());
             movieValues.put(DBContract.MovieEntry.COLUMN_POSTER_PATH, aMovie.getPosterPath());
             movieValues.put(DBContract.MovieEntry.COLUMN_BACKDROP_PATH, aMovie.getBackdropPath());
-            movieValues.put(DBContract.MovieEntry.COLUMN_FAVORITE, "1");
+            movieValues.put(DBContract.MovieEntry.COLUMN_FAVOURITE, "0");
 
             // Finally, insert movie data into the database.
             Uri insertedUri = mContext.getContentResolver().insert(
@@ -99,7 +99,7 @@ public class FetchMovieInfoTask extends AsyncTask<String, Void, Void> {
         // Wait, that worked?  Yes!
         return movieId;
     }
-
+*/
     /**
      * Take the String representing the complete JSON Format and
      * pull out the data we need to construct the Strings needed for the wireframes.
@@ -113,7 +113,7 @@ public class FetchMovieInfoTask extends AsyncTask<String, Void, Void> {
         final String TMDB_RESULTS = "results";
         final String TMDB_POSTER_PATH = "poster_path";
         final String TMDB_TITLE = "title";
-        final String base_path="http://image.tmdb.org/t/p/w185/";
+        final String base_path="http://image.tmdb.org/t/p/w185";
 
 
         try{
@@ -122,7 +122,7 @@ public class FetchMovieInfoTask extends AsyncTask<String, Void, Void> {
             JSONArray movieListArray = json.getJSONArray(TMDB_RESULTS);
 
             // Insert the new movie information into the database
-            Vector<ContentValues> cVVector = new Vector<ContentValues>(movieListArray.length());
+            Vector<ContentValues> cVector = new Vector<ContentValues>(movieListArray.length());
             //Log.d(LOG_TAG, "movieListArray.length():  " + movieListArray.length() );
             for(int i = 0; i < movieListArray.length(); i++) {
 
@@ -135,21 +135,28 @@ public class FetchMovieInfoTask extends AsyncTask<String, Void, Void> {
                 // so the content provider knows what kind of value is being inserted.
                 movieValues.put(DBContract.MovieEntry._ID, movieJson.getString("id"));
                 movieValues.put(DBContract.MovieEntry.COLUMN_TITLE, movieJson.getString(TMDB_TITLE));
-                movieValues.put(DBContract.MovieEntry.COLUMN_RELEASE_DATE, movieJson.getString("release_date"));
-                movieValues.put(DBContract.MovieEntry.COLUMN_VOTE_AVERAGE, movieJson.getString("vote_average"));
+                movieValues.put(DBContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movieJson.getString("original_title"));
                 movieValues.put(DBContract.MovieEntry.COLUMN_OVERVIEW, movieJson.getString("overview"));
+                movieValues.put(DBContract.MovieEntry.COLUMN_RELEASE_DATE, movieJson.getString("release_date"));
+                movieValues.put(DBContract.MovieEntry.COLUMN_ADULT, movieJson.getString("adult"));
+                movieValues.put(DBContract.MovieEntry.COLUMN_VIDEO, movieJson.getString("video"));
                 movieValues.put(DBContract.MovieEntry.COLUMN_POSTER_PATH, base_path + movieJson.getString(TMDB_POSTER_PATH));
-                movieValues.put(DBContract.MovieEntry.COLUMN_BACKDROP_PATH, movieJson.getString("backdrop_path"));
-                movieValues.put(DBContract.MovieEntry.COLUMN_FAVORITE, "1");
-                cVVector.add(movieValues);
+                movieValues.put(DBContract.MovieEntry.COLUMN_BACKDROP_PATH, base_path + movieJson.getString("backdrop_path"));
+
+                movieValues.put(DBContract.MovieEntry.COLUMN_POPULARITY, movieJson.getString("popularity"));
+                movieValues.put(DBContract.MovieEntry.COLUMN_VOTE_AVERAGE, movieJson.getString("vote_average"));
+                movieValues.put(DBContract.MovieEntry.COLUMN_VOTE_COUNT, movieJson.getString("vote_count"));
+
+                movieValues.put(DBContract.MovieEntry.COLUMN_FAVOURITE, "0");
+                cVector.add(movieValues);
                 //mContext.getContentResolver().insert(DBContract.MovieEntry.CONTENT_URI,movieValues);
             }
 
             int inserted = 0;
             // add to database
-            if ( cVVector.size() > 0 ) {
-                ContentValues[] cvArray = new ContentValues[cVVector.size()];
-                cVVector.toArray(cvArray);
+            if ( cVector.size() > 0 ) {
+                ContentValues[] cvArray = new ContentValues[cVector.size()];
+                cVector.toArray(cvArray);
                 // Finally, insert movies data into the database.
                 inserted = mContext.getContentResolver().bulkInsert(DBContract.MovieEntry.CONTENT_URI, cvArray);
 /*
@@ -161,7 +168,21 @@ public class FetchMovieInfoTask extends AsyncTask<String, Void, Void> {
                 notifyWeather();*/
             }
 
-            Log.d(LOG_TAG, "FetchMovieInfoTask Complete. " + inserted + " Inserted");
+            // Students: Uncomment the next lines to display what you stored in the bulkInsert
+            Cursor cur = mContext.getContentResolver().query(DBContract.MovieEntry.CONTENT_URI,
+                    null, null, null, null);
+
+            cVector = new Vector<ContentValues>(cur.getCount());
+            if ( cur.moveToFirst() ) {
+                do {
+                    ContentValues cv = new ContentValues();
+                    DatabaseUtils.cursorRowToContentValues(cur, cv);
+                    cVector.add(cv);
+                    //Log.d(LOG_TAG, "cv. " + cv );
+                } while (cur.moveToNext());
+            }
+            cur.close();
+            Log.d(LOG_TAG, "Complete. " + cVector.size()+ "    Inserted:" +inserted );
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
@@ -171,36 +192,55 @@ public class FetchMovieInfoTask extends AsyncTask<String, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(String... params) {
+    protected String doInBackground(String... params) {
+
+
+        // https://api.themoviedb.org/3/movie/popular?api_key=3cbbff71f9774f0a17ca0ae0bed2fc41
+        // Construct the URL for the THE_MOVIE_DB query
+        final String BASE_URL = "https://api.themoviedb.org/3/movie/";
+        String sortOrder="top_rated";
+        if(params[0].equals("popular"))
+        {
+            sortOrder="popular";
+        }else //if(params[0].equals("top_rated"))
+        {
+            //sortOrder="top_rated";
+        }
+        Uri builtUri = Uri.parse(BASE_URL).buildUpon()
+                .appendPath(sortOrder)
+                .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY)
+                .build();
+
+        String jsonStr = null;
+
+        try{
+
+            URL url = new URL(builtUri.toString()); //URL url = new URL(baseUrl.concat(apiKey));
+            //Log.v(LOG_TAG, " builtUri url "+url.toString());
+            jsonStr = downloadJson(url);
+            //Log.v(LOG_TAG, "jsonStr "+jsonStr);
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return jsonStr;
+    }
+
+    public static String downloadJson(URL url) {
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         // Will contain the raw JSON response as a string.
         String jsonStr = null;
+
         try {
-            // https://api.themoviedb.org/3/movie/popular?api_key=3cbbff71f9774f0a17ca0ae0bed2fc41
-            // Construct the URL for the THE_MOVIE_DB query
-            final String BASE_URL = "https://api.themoviedb.org/3/movie/";
-            String sortOrder="top_rated";
-            if(params[0].equals("popular"))
-            {
-                sortOrder="popular";
-            }else //if(params[0].equals("top_rated"))
-            {
-                //sortOrder="top_rated";
-            }
-            Uri builtUri = Uri.parse(BASE_URL).buildUpon()
-                    .appendPath(sortOrder)
-                    .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY)
-                    .build();
-            URL url = new URL(builtUri.toString()); //URL url = new URL(baseUrl.concat(apiKey));
-            //Log.v(LOG_TAG, " builtUri url "+url.toString());
 
             // Create the request, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
+
             // Read the input stream into a String
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
@@ -208,6 +248,7 @@ public class FetchMovieInfoTask extends AsyncTask<String, Void, Void> {
                 // Nothing to do.
                 return null;
             }
+
             reader = new BufferedReader(new InputStreamReader(inputStream));
 
             String line;
@@ -217,45 +258,50 @@ public class FetchMovieInfoTask extends AsyncTask<String, Void, Void> {
                 // buffer for debugging.
                 buffer.append(line + "\n");
             }
+
             if (buffer.length() == 0) {
                 // Stream was empty.  No point in parsing.
                 return null;
             }
 
             jsonStr = buffer.toString();
-            //Log.d(LOG_TAG, "jsonStr:  " + jsonStr );
-            getDataFromJson(jsonStr);
-            //Log.v(LOG_TAG, "jsonStr "+jsonStr);
+
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Error ", e);
-            // If the code didn't successfully get the movie data, there's no point in attempting
-            // to parse it.
+            Log.d("downloadJson", "Error" +url.toString(), e);
             return null;
+        } finally {
+            if (urlConnection != null)
+                urlConnection.disconnect();
+
+            if (reader != null)
+                try {
+                    reader.close();
+                } catch (Exception e) {
+                    Log.e("downloadJson", "Error closing stream", e);
+                }
+        }
+
+
+        return jsonStr;
+    }
+
+    @Override
+    protected void onPostExecute(String jsonStr) {
+        super.onPostExecute(jsonStr);
+
+        try {
+            if(jsonStr!=null) {
+                getDataFromJson(jsonStr);
+            }
+            else
+            {
+                Log.e(LOG_TAG, "onPostExecute jsonStr null");
+            }
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e(LOG_TAG, "Error closing stream", e);
-                }
-            }
         }
-        // This will only happen if there was an error getting or parsing the forecast.
-        return null;
-    }
-    /*
-    @Override
-    protected void onPostExecute(Movie[] movies) {
 
-        if (movies != null) {
-            mImageAdapter.clear();
-            mImageAdapter.addAll(movies);
-        }
-    }*/
+    }
+
 }
