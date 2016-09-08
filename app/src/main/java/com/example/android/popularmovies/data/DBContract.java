@@ -144,8 +144,8 @@ public class DBContract {
         public static final String TABLE_NAME = "review";
 
         // Column name
-        public static final String COLUMN_MOVIE_KEY = "movie_id";
-        public static final String COLUMN_ID = "id";
+        public static final String COLUMN_REVIEW_ID = "review_id";
+        public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_AUTHOR = "author";
         public static final String COLUMN_CONTENT = "content";
         public static final String COLUMN_URL = "url";

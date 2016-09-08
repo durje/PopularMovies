@@ -1,4 +1,4 @@
-package com.example.android.popularmovies;
+package com.example.android.popularmovies.FetchTasks;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.android.popularmovies.BuildConfig;
 import com.example.android.popularmovies.data.DBContract;
 
 import org.json.JSONArray;
@@ -237,7 +238,7 @@ public class FetchVideosTask extends AsyncTask<String, Void, String> {
                 Log.e(LOG_TAG, "onPostExecute jsonStr null");
             }
         // notify the callback data changed!!
-        mCallback.onFetchVideoFinished();
+        //mCallback.onFetchVideoFinished();
     }
 }
 

@@ -166,7 +166,7 @@ public class DBProvider extends ContentProvider {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         DBContract.ReviewEntry.TABLE_NAME,
                         projection,
-                        DBContract.ReviewEntry.COLUMN_MOVIE_KEY + "=?",
+                        DBContract.ReviewEntry.COLUMN_MOVIE_ID + "=?",
                         new String[] {Long.toString(id)},
                         null,
                         null,
@@ -374,8 +374,7 @@ public class DBProvider extends ContentProvider {
                 db.beginTransaction();
                 try {
                     for (ContentValues value : values) {
-
-                        // First, check if the movie exists in the db
+                        // First, check if the video exists in the db
                         Cursor videoCursor = this.query(
                                 DBContract.VideoEntry.CONTENT_URI,
                                 new String[]{DBContract.VideoEntry.COLUMN_VIDEO_ID},
@@ -402,9 +401,19 @@ public class DBProvider extends ContentProvider {
                 db.beginTransaction();
                 try {
                     for (ContentValues value : values) {
-                        long _id = db.insert(DBContract.ReviewEntry.TABLE_NAME, null, value);
-                        if (_id != -1) {
-                            returnCount++;
+                        // First, check if the review exists in the db
+                        Cursor reviewCursor = this.query(
+                                DBContract.ReviewEntry.CONTENT_URI,
+                                new String[]{DBContract.ReviewEntry.COLUMN_REVIEW_ID},
+                                DBContract.ReviewEntry.COLUMN_REVIEW_ID + " = ?" ,
+                                new String[]{value.get(DBContract.ReviewEntry.COLUMN_REVIEW_ID).toString()},
+                                null);
+
+                        if (!reviewCursor.moveToFirst()) {
+                            long _id = db.insert(DBContract.ReviewEntry.TABLE_NAME, null, value);
+                            if (_id != -1) {
+                                returnCount++;
+                            }
                         }
                     }
                     db.setTransactionSuccessful();

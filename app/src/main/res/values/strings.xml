@@ -23,5 +23,6 @@
     <string name="content_authority">com.example.android.popularmovies</string>
 
     <string name="movie_trailers_title">Movie trailers</string>
+    <string name="movie_trailers_review">Movie review</string>
 
 </resources>

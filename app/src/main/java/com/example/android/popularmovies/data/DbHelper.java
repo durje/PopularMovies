@@ -72,12 +72,12 @@ public class DbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_REVIEW_TABLE = "CREATE TABLE " + ReviewEntry.TABLE_NAME + "(" +
                 ReviewEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                ReviewEntry.COLUMN_MOVIE_KEY + " INTEGER NOT NULL, " +
-                ReviewEntry.COLUMN_ID + " TEXT NOT NULL, " +
+                ReviewEntry.COLUMN_REVIEW_ID + " INTEGER NOT NULL, " +
+                ReviewEntry.COLUMN_MOVIE_ID + " INTEGER  NOT NULL, " +
                 ReviewEntry.COLUMN_AUTHOR + " TEXT NULL, " +
                 ReviewEntry.COLUMN_CONTENT + " TEXT NULL, " +
                 ReviewEntry.COLUMN_URL + " TEXT NULL, " +
-                " FOREIGN KEY (" + ReviewEntry.COLUMN_MOVIE_KEY + ") REFERENCES " +
+                " FOREIGN KEY (" + ReviewEntry.COLUMN_MOVIE_ID + ") REFERENCES " +
                 MovieEntry.TABLE_NAME + " (" + MovieEntry._ID + "));";
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE); //execute this SQL

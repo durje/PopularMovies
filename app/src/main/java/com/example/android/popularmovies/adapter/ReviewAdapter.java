@@ -6,25 +6,23 @@ import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.DetailActivityFragment;
 import com.example.android.popularmovies.R;
 
 /**
- * Created by Jerome Durand on 28/06/2016.
+ * Created by Jerome Durand on 08/09/2016.
  */
-public class VideoAdapter extends CursorAdapter {
+public class ReviewAdapter extends CursorAdapter {
 
-
-    public VideoAdapter(Context context, Cursor c, int flags) {
+    public ReviewAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(R.layout.trailer_item, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.review_item, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         view.setTag(viewHolder);
         return view;
@@ -33,20 +31,19 @@ public class VideoAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-
         // Read video information from cursor
-        viewHolder.textName.setText(cursor.getString(DetailActivityFragment.COL_VIDEO_NAME));
-        //Log.d("VideoAdapter", "bindView: "+ cursor.getString(DetailActivityFragment.COL_VIDEO_NAME));
+        viewHolder.textAuthor.setText("A movie review by "+cursor.getString(DetailActivityFragment.COL_REVIEW_AUTHOR));
+        viewHolder.textContent.setText(cursor.getString(DetailActivityFragment.COL_REVIEW_CONTENT));
     }
 
     // Cache of the children view
     static class ViewHolder {
-        TextView textName;
-        ImageView imageView;
+        TextView textAuthor;
+        TextView textContent;
 
         public ViewHolder(View view) {
-            textName = (TextView) view.findViewById(R.id.textView_name);
-            imageView = (ImageView) view.findViewById(R.id.imageView_thumbnail);
+            textAuthor = (TextView) view.findViewById(R.id.textView_author);
+            textContent = (TextView) view.findViewById(R.id.textView_content);
         }
     }
 }

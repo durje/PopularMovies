@@ -27,6 +27,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.popularmovies.FetchTasks.FetchReviewsTask;
+import com.example.android.popularmovies.FetchTasks.FetchVideosTask;
+import com.example.android.popularmovies.adapter.ReviewAdapter;
 import com.example.android.popularmovies.adapter.VideoAdapter;
 import com.example.android.popularmovies.data.DBContract;
 import com.squareup.picasso.Picasso;
@@ -55,6 +58,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
     private static final int DETAIL_LOADER = 0;
     private static final int VIDEO_LOADER = 1;
+    private static final int REVIEW_LOADER = 2;
 
     private static final String[] DETAIL_COLUMNS = {
             DBContract.MovieEntry._ID,
@@ -111,9 +115,10 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     private TextView mOverviewView;
     private CheckBox mFavorite_btn_star;
     private ListView mVideoView;
+    private ListView mReviewView;
 
-    private VideoAdapter mVideoAdatper;
-    //private ReviewAdapter mReviewAdapter;
+    private VideoAdapter mVideoAdapter;
+    private ReviewAdapter mReviewAdapter;
 
     public DetailActivityFragment() {
         setHasOptionsMenu(true);
@@ -135,11 +140,11 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         mOverviewView = (TextView) rootView.findViewById(R.id.synopsisText);
         mFavorite_btn_star =(CheckBox) rootView.findViewById(R.id.btn_star);
         mVideoView = (ListView) rootView.findViewById(R.id.listView_video);
-
+        mReviewView= (ListView) rootView.findViewById(R.id.listView_review);
 
         // video adapter
-        mVideoAdatper = new VideoAdapter(getActivity(), null, 0);
-        mVideoView.setAdapter(mVideoAdatper);
+        mVideoAdapter = new VideoAdapter(getActivity(), null, 0);
+        mVideoView.setAdapter(mVideoAdapter);
 
         mVideoView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -165,7 +170,11 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             }
         });
 
+        //review adapter
+        mReviewAdapter = new ReviewAdapter(getActivity(), null, 0);
+        mReviewView.setAdapter(mReviewAdapter);
 
+        //favorite star
         mFavorite_btn_star.setTag(1);
         mFavorite_btn_star.setOnClickListener(new View.OnClickListener() {
 
@@ -208,15 +217,16 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         // loader movie video from content provider
         getLoaderManager().initLoader(VIDEO_LOADER, null, this);
 
-        //if (null != mUri)
-        {
+        Intent intent = getActivity().getIntent();
+        //Log.v("DetailActivityFragment", "onActivityCreated "+intent.getData().getLastPathSegment());
+        // fetch movie video data from internet
+        FetchVideosTask videoTask=new FetchVideosTask(getActivity(),this);
+        videoTask.execute(intent.getData().getLastPathSegment());
 
-            Intent intent = getActivity().getIntent();
-            //Log.v("DetailActivityFragment", "onActivityCreated "+intent.getData().getLastPathSegment());
-            // fetch movie video data from internet
-            FetchVideosTask videoTask=new FetchVideosTask(getActivity(),this);
-            videoTask.execute(intent.getData().getLastPathSegment());
-        }
+        // loader review  from content provider
+        getLoaderManager().initLoader(REVIEW_LOADER, null, this);
+        FetchReviewsTask reviewsTask=new FetchReviewsTask(getActivity());
+        reviewsTask.execute(intent.getData().getLastPathSegment());
 
         super.onActivityCreated(savedInstanceState);
     }
@@ -368,6 +378,18 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                             new String[]{intent.getData().getLastPathSegment()},
                             null
                     );
+                case REVIEW_LOADER:
+                    Log.v("DetailActivityFragment", "In onCreateLoader REVIEW_LOADER "+intent.getData().getLastPathSegment().toString());
+                    Uri reviewUri = DBContract.ReviewEntry.CONTENT_URI;
+                    return new CursorLoader(
+                            getActivity(),
+                            reviewUri,
+                            REVIEW_COLUMNS,
+                            DBContract.ReviewEntry.COLUMN_MOVIE_ID + "=?",
+                            new String[]{intent.getData().getLastPathSegment()},
+                            null
+                    );
+
                 default:
                     Log.d("DetailActivityFragment", "onCreateLoader: Unknown loader id");
                     break;
@@ -408,11 +430,14 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                     break;
                 case VIDEO_LOADER:
 
-                    mVideoAdatper.swapCursor(data);
+                    mVideoAdapter.swapCursor(data);
                     //mVideoAdatper.changeCursor(data);
                     //Log.v("onLoadFinished", "VIDEO_LOADER mVideoAdatper.getCount() "+ mVideoAdatper.getCount()+"  data.getCount():  "+data.getCount());
                     //mVideoView.setAdapter(mVideoAdatper);
                     //mVideoView.refreshDrawableState();
+                    break;
+                case REVIEW_LOADER:
+                     mReviewAdapter.swapCursor(data);
                     break;
                 default:
                     Log.d("onLoadFinished", "Unknown loader id: "+ loader.getId());
@@ -432,7 +457,10 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             case DETAIL_LOADER:
                 break;
             case VIDEO_LOADER:
-                mVideoAdatper.swapCursor(null);
+                mVideoAdapter.swapCursor(null);
+                break;
+            case REVIEW_LOADER:
+                mReviewAdapter.swapCursor(null);
                 break;
             default:
                 Log.d("DetailFragment", "onLoaderReset: Unknown loader id: "+ loader.getId());
