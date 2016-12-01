@@ -183,7 +183,7 @@ public class FetchMovieInfoTask extends AsyncTask<String, Void, String> {
                 } while (cur.moveToNext());
             }
             cur.close();
-            Log.d(LOG_TAG, "Complete. " + cVector.size()+ "    Inserted:" +inserted );
+            //Log.d(LOG_TAG, "Complete. " + cVector.size()+ "    Inserted:" +inserted );
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
@@ -195,34 +195,34 @@ public class FetchMovieInfoTask extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... params) {
 
-
+        String jsonStr = null;
         // https://api.themoviedb.org/3/movie/popular?api_key=3cbbff71f9774f0a17ca0ae0bed2fc41
         // Construct the URL for the THE_MOVIE_DB query
         final String BASE_URL = "https://api.themoviedb.org/3/movie/";
-        String sortOrder="top_rated";
+        String sortOrder=params[0];
+       /* String sortOrder="top_rated";
         if(params[0].equals("popular"))
         {
             sortOrder="popular";
         }else //if(params[0].equals("top_rated"))
         {
             //sortOrder="top_rated";
-        }
-        Uri builtUri = Uri.parse(BASE_URL).buildUpon()
-                .appendPath(sortOrder)
-                .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY)
-                .build();
+        }*/
+        if(!sortOrder.equals("favorite")) {
+            Uri builtUri = Uri.parse(BASE_URL).buildUpon()
+                    .appendPath(sortOrder)
+                    .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY)
+                    .build();
+            try {
 
-        String jsonStr = null;
+                URL url = new URL(builtUri.toString()); //URL url = new URL(baseUrl.concat(apiKey));
+                //Log.v(LOG_TAG, " builtUri url "+url.toString());
+                jsonStr = downloadJson(url);
+                //Log.v(LOG_TAG, "jsonStr "+jsonStr);
 
-        try{
-
-            URL url = new URL(builtUri.toString()); //URL url = new URL(baseUrl.concat(apiKey));
-            //Log.v(LOG_TAG, " builtUri url "+url.toString());
-            jsonStr = downloadJson(url);
-            //Log.v(LOG_TAG, "jsonStr "+jsonStr);
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
         }
         return jsonStr;
     }
@@ -268,7 +268,7 @@ public class FetchMovieInfoTask extends AsyncTask<String, Void, String> {
             jsonStr = buffer.toString();
 
         } catch (IOException e) {
-            Log.d("downloadJson", "Error" +url.toString(), e);
+            Log.d("downloadJson", "Error: " +url.toString(), e);
             return null;
         } finally {
             if (urlConnection != null)

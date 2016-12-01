@@ -1,155 +1,150 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
+    xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.android.popularmovies.DetailActivityFragment"
     tools:showIn="@layout/content_detail"
     android:weightSum="1">
 
-    <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" >
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/backdropimageView"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Chappie"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:id="@+id/titleView"
+            android:paddingTop="16dp"
+            android:textAlignment="center"/>
 
         <LinearLayout
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp">
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/backdropimageView"
-                android:scaleType="centerCrop"
-                android:adjustViewBounds="true" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Chappie"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:id="@+id/titleView"
-                android:paddingTop="16dp"
-                android:textAlignment="center"/>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp">
-
-                <ImageView
-                    android:id="@+id/posterimageView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxWidth="150dp"
-                    android:scaleType="fitCenter"
-                    android:adjustViewBounds="true"
-                    android:paddingLeft="30dp" />
-
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="137dp"
-                    android:weightSum="1"
-                    android:paddingLeft="20dp"
-                    android:textAlignment="center"
-                    android:baselineAligned="false">
-
-                    <TextView
-                        android:id="@+id/yearText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="10dp"
-                        android:textAppearance="?android:attr/textAppearanceLarge"
-                        android:text="2015"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/timeText"
-                        android:text="120min"
-                        android:enabled="false"
-                        android:visibility="invisible" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/voteAverageText"
-                        android:text="8.55/10"/>
-
-                    <CheckBox android:id="@+id/btn_star"
-                        android:layout_width="wrap_content"
-                        android:layout_height="fill_parent"
-                        android:button="@android:drawable/btn_star" />
-
-                </LinearLayout>
-            </LinearLayout>
-
-            <TextView
+                android:id="@+id/posterimageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/synopsisText"
-                android:text="synopsis "
+                android:maxWidth="150dp"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                android:paddingLeft="30dp" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="137dp"
+                android:weightSum="1"
                 android:paddingLeft="20dp"
-                android:paddingTop="20dp" />
+                android:textAlignment="center"
+                android:baselineAligned="false">
 
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="2dip"
-                android:background="#000000"
-                android:layout_marginTop="10dp"
-                />
+                <TextView
+                    android:id="@+id/yearText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="2015"/>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/movie_trailers_title"
-                android:paddingLeft="5dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:textSize="25dp"
-                android:textStyle="bold"
-                android:textAlignment="center"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/timeText"
+                    android:text="120min"
+                    android:enabled="false"
+                    android:visibility="invisible" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/voteAverageText"
+                    android:text="8.55/10"/>
 
+                <CheckBox android:id="@+id/btn_star"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:button="@android:drawable/btn_star" />
 
-            <ListView
-                android:id="@+id/listView_video"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawSelectorOnTop="false"
-                android:text="No trailers available!"
-                android:paddingBottom="10dp"
-                />
-
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="2dip"
-                android:background="#000000"
-                android:layout_marginTop="10dp"
-                />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/movie_trailers_review"
-                android:paddingLeft="5dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:textSize="25dp"
-                android:textStyle="bold"
-                android:textAlignment="center"/>
-
-            <ListView
-                android:id="@+id/listView_review"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawSelectorOnTop="false"
-                android:text="No reviews available!"
-                android:paddingBottom="10dp"
-                />
-
+            </LinearLayout>
         </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/synopsisText"
+            android:text="synopsis "
+            android:paddingLeft="20dp"
+            android:paddingTop="20dp" />
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2dip"
+            android:background="#000000"
+            android:layout_marginTop="10dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/movie_trailers_title"
+            android:paddingLeft="5dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            android:textAlignment="center"/>
+
+
+        <ListView
+            android:id="@+id/listView_video"
+            android:nestedScrollingEnabled="true"
+            android:fillViewport="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            />
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2dip"
+            android:background="#000000"
+            android:layout_marginTop="10dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/movie_trailers_review"
+            android:paddingLeft="5dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            android:textAlignment="center"/>
+
+        <ListView
+            android:id="@+id/listView_review"
+            android:fillViewport="true"
+            android:nestedScrollingEnabled="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            />
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

@@ -11,11 +11,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -58,26 +56,26 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         //inflater.inflate(R.menu., menu);
     }
-
+/*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-       /* if (id == R.id.action_refresh) {
+        if (id == R.id.action_refresh) {
 
             return true;
         }
-        */
+
         return super.onOptionsItemSelected(item);
     }
-
+*/
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        Log.d("MainActivityFragment", "onCreateView" );
+        //Log.d("MainActivityFragment", "onCreateView" );
         // The CursorAdapter will take data from our cursor and populate the GridView
         mMovieAdapter= new MovieAdapter(getActivity(), null, 0);
 
@@ -112,7 +110,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         super.onActivityCreated(savedInstanceState);
         Bundle bundle = new Bundle();
         bundle.putString(SORT_BY_KEY, getPreferenceSortOrder());
-        getLoaderManager().initLoader(MOVIE_LOADER  ,bundle, this);
+        getLoaderManager().initLoader(MOVIE_LOADER  ,null, this);
 
     }
 
@@ -126,25 +124,42 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     }
 
     private void updateMovies(){
-        FetchMovieInfoTask task=new FetchMovieInfoTask(getActivity());
-        task.execute(getPreferenceSortOrder());
+        //Log.d("MainActivityFragment", "updateMovies" );
+
+        String prefSortOrder = getPreferenceSortOrder();
+        if(prefSortOrder.equals("popular")||prefSortOrder.equals("top_rated"))
+        {
+            FetchMovieInfoTask task=new FetchMovieInfoTask(getActivity());
+            task.execute(prefSortOrder);
+
+        }else if(prefSortOrder.equals("favorite"))
+        {
+
+        }
+
+        getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
     }
 
 
     @Override
     public void onStart() {
         super.onStart();
-        updateMovies();
+        //updateMovies();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateMovies();
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
 
         String prefSortOrder = getPreferenceSortOrder();
-        Log.d("MainActivityFragment", "onCreateLoader: "+prefSortOrder );
-        //String sortOrder="popularity";
-        String sortOrder="vote_average";
+        //Log.d("MainActivityFragment", "onCreateLoader, getPreferenceSortOrder: "+prefSortOrder );
+        String sortOrder="favorite";
+        //String sortOrder="vote_average";
         if(prefSortOrder.equals("popular"))
         {
             prefSortOrder= DBContract.MovieEntry.COLUMN_POPULARITY + " DESC";
@@ -160,7 +175,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         }
 
         Uri movieUri = DBContract.MovieEntry.CONTENT_URI;
-        Log.d("MainActivityFragment", "onCreateLoader" );
+        //Log.d("MainActivityFragment", "onCreateLoader"+movieUri.toString()+"  sortOrder: "+sortOrder);
         return new CursorLoader(getActivity(), movieUri, MOVIE_COLUMNS, null, null, sortOrder);
     }
 

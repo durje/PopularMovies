@@ -33,7 +33,6 @@ public class MovieAdapter  extends CursorAdapter {
         View imageView = LayoutInflater.from(context).inflate(R.layout.list_item_poster, parent, false);
         ViewHolder viewHolder = new ViewHolder(imageView);
         imageView.setTag(viewHolder);
-        //Log.d("MovieAdapter", "new View " );
         return imageView;
     }
 
@@ -45,26 +44,21 @@ public class MovieAdapter  extends CursorAdapter {
 
         final String base_path="http://image.tmdb.org/t/p/w185";
         String posterUrlStr ="";
-        /*base_path+*/
         // Read poster path from cursor
         posterUrlStr=cursor.getString(MainActivityFragment.COL_POSTER_PATH);
-        //Log.d("MovieAdapter", "bindView"+ posterUrlStr );
         //if (((ImageView)view).getDrawable() == null)
         {
             Picasso.with(context)
                     .load(posterUrlStr)
                     //.placeholder(R.drawable.placeholder)
                     //.error(R.drawable.placeholder_error)
-                    //.into(viewHolder.posterView);
-                    .into((ImageView)view);
-            //Log.d("MovieAdapter", "posterUrlStr: " + posterUrlStr);
-            //notifyDataSetChanged();
+                    .into(viewHolder.posterView);
+                    //.into((ImageView)view);
         }
         //else
         {
             //view = (ImageView) view;
         }
-
     }
 
     // Cache of the children view

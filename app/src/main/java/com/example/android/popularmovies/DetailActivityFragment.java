@@ -1,6 +1,5 @@
 package com.example.android.popularmovies;
 
-import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -34,26 +33,13 @@ import com.example.android.popularmovies.adapter.VideoAdapter;
 import com.example.android.popularmovies.data.DBContract;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * A placeholder fragment containing a simple view.
  */
 public class DetailActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,FetchVideosTask.Callback {
 
     private ShareActionProvider mShareActionProvider;
-    private String mShareVideoStr="https://youtu.be/";
+    private String mShareVideoStr;
     private Uri mUri;
 
     private static final int DETAIL_LOADER = 0;
@@ -140,8 +126,53 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         mOverviewView = (TextView) rootView.findViewById(R.id.synopsisText);
         mFavorite_btn_star =(CheckBox) rootView.findViewById(R.id.btn_star);
         mVideoView = (ListView) rootView.findViewById(R.id.listView_video);
-        mReviewView= (ListView) rootView.findViewById(R.id.listView_review);
 
+/*
+        mVideoView.setOnTouchListener(new ListView.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Disallow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        // Allow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
+                        break;
+                }
+
+                // Handle ListView touch events.
+                v.onTouchEvent(event);
+                return true;
+            }
+        });
+*/
+
+        mReviewView= (ListView) rootView.findViewById(R.id.listView_review);/*
+        mReviewView.setOnTouchListener(new ListView.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Disallow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        // Allow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
+                        break;
+                }
+
+                // Handle ListView touch events.
+                v.onTouchEvent(event);
+                return true;
+            }
+        });*/
         // video adapter
         mVideoAdapter = new VideoAdapter(getActivity(), null, 0);
         mVideoView.setAdapter(mVideoAdapter);
@@ -151,7 +182,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
-               /*
+
                 if (cursor != null) {
                     String key = cursor.getString(COL_VIDEO_KEY);
 
@@ -166,7 +197,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                 } else {
                     Log.d("DetailActivityFragment", "cursor is null?");
                 }
-                */
+
             }
         });
 
@@ -245,14 +276,32 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         // If onLoadFinished happens before this, we can go ahead and set the share intent now.
         if (mShareActionProvider != null && mShareVideoStr!=null)
         {
+
             mShareActionProvider.setShareIntent(createShareVideoIntent());
         }
     }
 
+    private Intent createShareVideoIntent() {
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        //Intent shareIntent = new Intent(Intent.ACTION_VIEW);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Share video link!");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, mShareVideoStr);
+        return shareIntent;
+
+
+/*
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + key));
+        intent.putExtra("VIDEO_ID", key);
+        startActivity(intent);*/
+    }
+/*
     private void openVideo(String strId){
 
 
-        //http://api.themoviedb.org/3/movie/293660/videos?api_key=3cbbff71f9774f0a17ca0ae0bed2fc41
+        //http://api.themoviedb.org/3/movie/293660/videos?api_key=xxxxxxxxxxxxxxx
         String BASE_URL="http://api.themoviedb.org/3/movie/"+strId+"/videos";
 
         HttpURLConnection urlConnection = null;
@@ -337,7 +386,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             e.printStackTrace();
         }
 
-    }
+    }*/
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -379,7 +428,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                             null
                     );
                 case REVIEW_LOADER:
-                    Log.v("DetailActivityFragment", "In onCreateLoader REVIEW_LOADER "+intent.getData().getLastPathSegment().toString());
+                    //Log.v("DetailActivityFragment", "In onCreateLoader REVIEW_LOADER "+intent.getData().getLastPathSegment().toString());
                     Uri reviewUri = DBContract.ReviewEntry.CONTENT_URI;
                     return new CursorLoader(
                             getActivity(),
@@ -435,6 +484,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                     //Log.v("onLoadFinished", "VIDEO_LOADER mVideoAdatper.getCount() "+ mVideoAdatper.getCount()+"  data.getCount():  "+data.getCount());
                     //mVideoView.setAdapter(mVideoAdatper);
                     //mVideoView.refreshDrawableState();
+                    data.moveToFirst();
+                    mShareVideoStr="https://www.youtube.com/watch?v="+data.getString(COL_VIDEO_KEY);
                     break;
                 case REVIEW_LOADER:
                      mReviewAdapter.swapCursor(data);
@@ -470,13 +521,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
 
 
-    private Intent createShareVideoIntent() {
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, mShareVideoStr);
-        return shareIntent;
-    }
+
 
     @Override
     public void onFetchVideoFinished() {

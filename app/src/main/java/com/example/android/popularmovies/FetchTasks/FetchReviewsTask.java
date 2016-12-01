@@ -105,7 +105,7 @@ public class FetchReviewsTask extends AsyncTask<String, Void, String> {
                 videoValues.put(DBContract.ReviewEntry.COLUMN_URL, jsonVideoObject.getString(OWN_URL));
 
 
-                Log.v(LOG_TAG, "Review: " +(i+1)+"  Author"+ jsonVideoObject.getString(OWN_AUTHOR));
+                //Log.v(LOG_TAG, "Review: " +(i+1)+"  Author"+ jsonVideoObject.getString(OWN_AUTHOR));
                 cVector.add(videoValues);
 
             }
@@ -146,7 +146,7 @@ public class FetchReviewsTask extends AsyncTask<String, Void, String> {
             }
             cur.close();
 
-            Log.d(LOG_TAG, "Complete. " + cVector.size()+ "    Inserted:" +inserted );
+            //Log.d(LOG_TAG, "Complete. " + cVector.size()+ "    Inserted:" +inserted );
 
         } catch (JSONException e) {
             Log.d(LOG_TAG, "JSON Error", e);

@@ -3,4 +3,83 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/backdropimageView"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Chappie"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:id="@+id/titleView"
+            android:paddingTop="16dp"
+            android:textAlignment="center"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp">
+
+            <ImageView
+                android:id="@+id/posterimageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="150dp"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                android:paddingLeft="30dp" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="137dp"
+                android:weightSum="1"
+                android:paddingLeft="20dp"
+                android:textAlignment="center"
+                android:baselineAligned="false">
+
+                <TextView
+                    android:id="@+id/yearText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="2015"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/timeText"
+                    android:text="120min"
+                    android:enabled="false"
+                    android:visibility="invisible" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/voteAverageText"
+                    android:text="8.55/10"/>
+
+                <CheckBox android:id="@+id/btn_star"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:button="@android:drawable/btn_star" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/synopsisText"
+            android:text="synopsis "
+            android:paddingLeft="20dp"
+            android:paddingTop="20dp" />
+
 </LinearLayout>
